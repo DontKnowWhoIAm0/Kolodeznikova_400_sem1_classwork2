@@ -9,4 +9,5 @@ public interface UserService {
 
     List<UserDto> getAll() throws SQLException;
     void registerUser(String name, String lastname, String login, String password) throws SQLException;
+    boolean loginExists(String login) throws SQLException;
 }

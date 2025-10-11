@@ -32,4 +32,9 @@ public class UserServiceImpl implements UserService {
         }
         return PasswordUtil.encrypt(password).equals(user.getPassword());
     }
+
+    @Override
+    public boolean loginExists(String login) throws SQLException {
+        return userDao.getByLogin(login) != null;
+    }
 }
