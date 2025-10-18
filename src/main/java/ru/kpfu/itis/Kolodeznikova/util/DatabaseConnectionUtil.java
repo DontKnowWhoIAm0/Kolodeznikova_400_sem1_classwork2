@@ -13,7 +13,7 @@ public class DatabaseConnectionUtil {
             try {
                 Class.forName("org.postgresql.Driver");
                 connection = DriverManager.getConnection(
-                        "jdbc:postgresql://localhost:5432/postgres?charSet=UTF8",
+                        "jdbc:postgresql://localhost:5432/postgres",
                         "postgres",
                         "$Okol622"
                 );

@@ -8,6 +8,6 @@ import java.util.List;
 public interface UserService {
 
     List<UserDto> getAll() throws SQLException;
-    void registerUser(String name, String lastname, String login, String password) throws SQLException;
+    void registerUser(String name, String lastname, String login, String password, String profileImage) throws SQLException;
     boolean loginExists(String login) throws SQLException;
 }

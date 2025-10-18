@@ -19,9 +19,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(String name, String lastname, String login, String password) throws SQLException {
+    public void registerUser(String name, String lastname, String login, String password, String profileImage) throws SQLException {
         String hashedPassword = PasswordUtil.encrypt(password);
-        User user = new User(null, name, lastname, login, hashedPassword);
+        User user = new User(null, name, lastname, login, hashedPassword, profileImage);
         userDao.save(user);
     }
 

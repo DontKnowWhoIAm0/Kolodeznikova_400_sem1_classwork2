@@ -2,6 +2,7 @@ package ru.kpfu.itis.Kolodeznikova.server;
 
 import ru.kpfu.itis.Kolodeznikova.dao.UserDao;
 import ru.kpfu.itis.Kolodeznikova.dao.impl.UserDaoImpl;
+import ru.kpfu.itis.Kolodeznikova.entity.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,15 +33,20 @@ public class MainServlet extends HttpServlet {
         }
 
         UserDao userDao = new UserDaoImpl();
+        User u;
 
         try {
-            req.setAttribute("user", userDao.getByLogin(user).getName());
+            u = userDao.getByLogin(user);
+            req.setAttribute("user", u.getName());
+            req.setAttribute("profileImage", u.getProfileImage());
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         req.setAttribute("cookieUser", cookieUser);
         req.setAttribute("sessionId", session.getId());
         req.setAttribute("counter", req.getAttribute("counter"));;
+
 
         req.getRequestDispatcher("index.ftl").forward(req, resp);
     }
