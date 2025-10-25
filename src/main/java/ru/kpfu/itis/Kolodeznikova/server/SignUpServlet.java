@@ -14,6 +14,7 @@
     import javax.servlet.http.HttpServletResponse;
     import javax.servlet.http.Part;
     import java.io.IOException;
+    import java.io.InputStream;
     import java.sql.SQLException;
 
     @WebServlet(name = "SignUp", urlPatterns = "/signup")
@@ -44,10 +45,14 @@
             }
 
             Part part = req.getPart("profile_image");
+            InputStream inputStream = part.getInputStream();
+            byte[] imageBytes = new byte[inputStream.available()];
+            int bytesRead = inputStream.read(imageBytes);
+            inputStream.close();
 
             UserService userService = new UserServiceImpl();
             try {
-                userService.registerUser(name, lastname, login, password, part.getInputStream().readAllBytes());
+                userService.registerUser(name, lastname, login, password, imageBytes);
                 resp.sendRedirect("login.ftl");
             } catch (SQLException e) {
                 if (e.getSQLState().equals("23505")) {
