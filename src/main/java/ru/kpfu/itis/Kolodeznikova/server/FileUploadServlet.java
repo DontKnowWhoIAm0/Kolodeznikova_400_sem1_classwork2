@@ -1,6 +1,9 @@
 package ru.kpfu.itis.Kolodeznikova.server;
 
 
+import com.cloudinary.Cloudinary;
+import ru.kpfu.itis.Kolodeznikova.util.CloudinaryUtil;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -13,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet("/upload")
 @MultipartConfig(
@@ -23,6 +28,7 @@ public class FileUploadServlet extends HttpServlet {
 
     public static final String FILE_PREFIX = "/tmp";
     public static final int DIRECTORIES_COUNT = 100;
+    public static final Cloudinary cloudinary = CloudinaryUtil.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -41,15 +47,12 @@ public class FileUploadServlet extends HttpServlet {
                 filename
         );
 
-        InputStream content = part.getInputStream();
-        file.getParentFile().mkdirs();
-        file.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(file);
-        byte[] buffer = new byte[content.available()];
-        content.read(buffer);
-        outputStream.write(buffer);
-        outputStream.close();
-
-        resp.sendRedirect("main");
+        try (InputStream content = part.getInputStream()) {
+            HashMap<String, Object> uploadParams = new HashMap<>();
+            uploadParams.put("public_id", filename);
+            uploadParams.put("folder", "uploads");
+            Map uploadResult = cloudinary.uploader().upload(content, uploadParams);
+            String imageUrl = (String) uploadResult.get("secure_url");
+        }
     }
 }

@@ -13,11 +13,7 @@
     import javax.servlet.http.HttpServletRequest;
     import javax.servlet.http.HttpServletResponse;
     import javax.servlet.http.Part;
-    import java.io.File;
-    import java.io.FileOutputStream;
     import java.io.IOException;
-    import java.io.InputStream;
-    import java.nio.file.Paths;
     import java.sql.SQLException;
 
     @WebServlet(name = "SignUp", urlPatterns = "/signup")
@@ -29,7 +25,7 @@
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-            resp.sendRedirect("signup.ftl");
+            req.getRequestDispatcher("signup.ftl").forward(req, resp);
         }
 
         @Override
@@ -39,31 +35,19 @@
             String login = req.getParameter("login");
             String password = req.getParameter("password");
 
-            if (login == null || password == null || name == null || lastname == null || login.isEmpty() || password.isEmpty() || name.isEmpty() || lastname.isEmpty() || req.getPart("profile_image").getSubmittedFileName().isEmpty()) {
+            if (login == null || password == null || name == null || lastname == null
+                    || login.isEmpty() || password.isEmpty() || name.isEmpty() || lastname.isEmpty()
+                    || req.getPart("profile_image").getSubmittedFileName().isEmpty()) {
                 req.setAttribute("error", "1");
                 req.getRequestDispatcher("signup.ftl").forward(req, resp);
                 return;
             }
 
             Part part = req.getPart("profile_image");
-            String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-            File file = new File(uploadPath+ File.separator + "profile_images" + File.separator + filename.hashCode() % DIRECTORIES_COUNT + File.separator + filename);
-
-            InputStream content = part.getInputStream();
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream(file);
-            byte[] buffer = new byte[content.available()];
-            content.read(buffer);
-            outputStream.write(buffer);
-            outputStream.close();
-
-            String imagePath = "uploads" + File.separator + "profile_images" + File.separator + filename.hashCode() % DIRECTORIES_COUNT + File.separator + filename;
 
             UserService userService = new UserServiceImpl();
             try {
-                userService.registerUser(name, lastname, login, password, imagePath);
+                userService.registerUser(name, lastname, login, password, part.getInputStream().readAllBytes());
                 resp.sendRedirect("login.ftl");
             } catch (SQLException e) {
                 if (e.getSQLState().equals("23505")) {

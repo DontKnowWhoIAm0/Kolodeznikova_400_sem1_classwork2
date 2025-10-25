@@ -1,14 +1,19 @@
 package ru.kpfu.itis.Kolodeznikova.service.impl;
 
+import com.cloudinary.utils.ObjectUtils;
 import ru.kpfu.itis.Kolodeznikova.dao.UserDao;
 import ru.kpfu.itis.Kolodeznikova.dao.impl.UserDaoImpl;
 import ru.kpfu.itis.Kolodeznikova.dto.UserDto;
 import ru.kpfu.itis.Kolodeznikova.entity.User;
 import ru.kpfu.itis.Kolodeznikova.service.UserService;
+import ru.kpfu.itis.Kolodeznikova.util.CloudinaryUtil;
 import ru.kpfu.itis.Kolodeznikova.util.PasswordUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class UserServiceImpl implements UserService {
     private final UserDao userDao = new UserDaoImpl();
@@ -19,9 +24,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(String name, String lastname, String login, String password, String profileImage) throws SQLException {
+        public void registerUser(String name, String lastname, String login, String password, byte[] bytes) throws SQLException, IOException {
         String hashedPassword = PasswordUtil.encrypt(password);
-        User user = new User(null, name, lastname, login, hashedPassword, profileImage);
+        Map uploadResult = CloudinaryUtil.getInstance().uploader().upload(bytes, ObjectUtils.emptyMap());
+        String imageUrl = (String) uploadResult.get("secure_url");
+        User user = new User(null, name, lastname, login, hashedPassword, imageUrl);
         userDao.save(user);
     }
 

@@ -42,7 +42,6 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void save(User user) throws SQLException {
-        System.out.println("save user");
         String sql = "insert into users (name, lastname, login, password, profile_image) values (?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setString(1, user.getName());

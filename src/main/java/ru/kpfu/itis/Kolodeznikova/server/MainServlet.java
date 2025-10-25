@@ -47,7 +47,6 @@ public class MainServlet extends HttpServlet {
         req.setAttribute("sessionId", session.getId());
         req.setAttribute("counter", req.getAttribute("counter"));;
 
-
         req.getRequestDispatcher("index.ftl").forward(req, resp);
     }
 
